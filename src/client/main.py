@@ -1,7 +1,8 @@
 import cv2
+import threading
 from src.client.local_inference import LocalPlateDetector
 from src.client.remote_inference import RemotePlateDetector
-from src.client.network_monitor import RTTMonitor
+from src.monitoring.network_monitor import NetworkMonitor  # Atualizado
 from src.client.camera_handler import CameraProcessor
 
 RTSP_STREAMS = {
@@ -10,17 +11,21 @@ RTSP_STREAMS = {
 }
 
 def main():
-    rtt_monitor = RTTMonitor()
-    rtt_monitor.start()
+    # Iniciar o monitoramento de rede
+    network_monitor = NetworkMonitor(host="192.168.15.1", interval=1, status_file="src/monitoring/network_status.json")
+    threading.Thread(target=network_monitor.start, daemon=True).start()
 
-    local_detector = LocalPlateDetector("models/nano.pt")
-    remote_detector = RemotePlateDetector()
+    #local_detector = LocalPlateDetector("models/nano.pt")
+    ##remote_detector = RemotePlateDetector()
 
     cameras = []
     for cam_id, rtsp in RTSP_STREAMS.items():
-        cam = CameraProcessor(cam_id, rtsp, rtt_monitor, local_detector, remote_detector)
+        local_detector = LocalPlateDetector("models/nano.pt")
+        remote_detector = RemotePlateDetector()
+        cam = CameraProcessor(cam_id, rtsp, local_detector, remote_detector)
         cam.start()
         cameras.append(cam)
+
 
     cv2.namedWindow("Placas", cv2.WINDOW_NORMAL)
     while True:
@@ -34,4 +39,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

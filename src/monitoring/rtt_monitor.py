@@ -1,9 +1,11 @@
+# monitoring/rtt_monitor.py
+
 import subprocess
 import time
 import threading
 
 class RTTMonitor:
-    def __init__(self, host="localhost", interval=5):
+    def __init__(self, host, interval=1):
         self.host = host
         self.interval = interval
         self.rtt = 0.0
@@ -27,7 +29,7 @@ class RTTMonitor:
                             time_str = line.split("time=")[1].split(" ")[0]
                             with self.lock:
                                 self.rtt = float(time_str)
-                            print(f"[RTT] {self.rtt:.2f} ms")
+                            #print(f"[RTT] {self.rtt:.2f} ms")
             except Exception as e:
                 print(f"[RTT] Erro: {e}")
             time.sleep(self.interval)
@@ -35,4 +37,3 @@ class RTTMonitor:
     def get_rtt(self):
         with self.lock:
             return self.rtt
-
