@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerenciador de Câmeras</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-light">
+
+<div class="container py-4">
+
+    <h2 class="mb-4">Adicionar Nova Câmera</h2>
+    <form action="/add_camera" method="post" class="row g-3 mb-5">
+        <div class="col-md-5">
+            <input type="text" class="form-control" name="cam_id" placeholder="ID da Câmera" required>
+        </div>
+        <div class="col-md-5">
+            <input type="text" class="form-control" name="rtsp_url" placeholder="RTSP URL" required>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Adicionar</button>
+        </div>
+    </form>
+
+    <hr>
+
+    <h2 class="mb-4">Câmeras Ativas</h2>
+    <div class="row">
+        {% for cam_id in cameras %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ cam_id }}</h5>
+                    <a href="/remove_camera/{{ cam_id }}" class="btn btn-sm btn-outline-danger">Remover</a>
+                </div>
+                <div class="card-body p-0">
+                    <img src="/video/{{ cam_id }}" class="img-fluid" alt="Stream da câmera">
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h2 class="mb-3">Últimas Placas Detectadas</h2>
+    <div class="card p-3">
+        <div class="row text-center fw-bold mb-2">
+            <div class="col-md-4">Câmera</div>
+            <div class="col-md-4">Placa</div>
+            <div class="col-md-4">Data/Horário</div>
+        </div>
+        <div id="placa-historico">
+            <p>Carregando...</p>
+        </div>
+    </div>
+
+
+</div>
+
+<script>
+function atualizarHistorico() {
+    fetch('/api/ultimas_placas')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('placa-historico');
+            if (data.length === 0) {
+                container.innerHTML = '<p>Nenhuma placa detectada.</p>';
+                return;
+            }
+            let html = '<ul class="list-group">';
+            data.forEach(entry => {
+            html += `
+            <li class="list-group-item">
+                <div class="row text-center">
+                    <div class="col-md-4"><strong>${entry[1]}</strong></div> <!-- Câmera -->
+                    <div class="col-md-4 text-primary"><strong>${entry[0]}</strong></div> <!-- Placa -->
+                    <div class="col-md-4 text-muted">${entry[2]}</div> <!-- Data/Horário -->
+                </div>
+            </li>`;
+        });
+
+            html += '</ul>';
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Erro ao buscar histórico:', error);
+        });
+}
+
+// Atualiza imediatamente e depois a cada segundo
+atualizarHistorico();
+setInterval(atualizarHistorico, 1000);
+</script>
+
+</body>
+</html>

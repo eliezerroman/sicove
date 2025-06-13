@@ -5,3 +5,4 @@ protobuf==5.29.4
 pytesseract==0.3.13
 torch==2.7.0
 ultralytics==8.3.144
+flask==3.1.1

@@ -1,4 +1,5 @@
 import cv2
+import torch
 import numpy as np
 import pytesseract
 from ultralytics import YOLO
@@ -9,7 +10,16 @@ from src.proto import plate_detection_pb2_grpc
 class PlateDetectionService(plate_detection_pb2_grpc.PlateDetectionServicer):
     def __init__(self, model_path):
         self.model = YOLO(model_path)
-        self.model.to("mps")  # ou "cuda" conforme necessário
+
+        if torch.cuda.is_available():
+            self.model.to("cuda")
+            print("Usando GPU com CUDA")
+        elif torch.backends.mps.is_available():
+            self.model.to("mps")
+            print("Usando GPU com MPS")
+        else:
+            self.model.to("cpu")
+            print("Usando CPU")
 
     def DetectPlate(self, request, context):
         nparr = np.frombuffer(request.image, np.uint8)
@@ -23,8 +33,8 @@ class PlateDetectionService(plate_detection_pb2_grpc.PlateDetectionServicer):
             box = results[0].boxes[0]
             x1, y1, x2, y2 = map(int, box.xyxy[0])
             roi = frame[y1:y2, x1:x2]
-            #plate_text = pytesseract.image_to_string(roi, config="--psm 8").strip()
-            plate_text = "000-0000"  # Simulação de texto de placa para teste
+            plate_text = pytesseract.image_to_string(roi, config="--psm 8").strip()
+            #plate_text = "000-0000"  # Simulação de texto de placa para teste
 
         return plate_detection_pb2.DetectionResponse(
             plate_text=plate_text, x1=x1, y1=y1, x2=x2, y2=y2

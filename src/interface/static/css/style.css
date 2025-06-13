@@ -1,0 +1,11 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card img {
+    border-bottom: 1px solid #ddd;
+}
+
+form input {
+    min-width: 100%;
+}
