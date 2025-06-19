@@ -108,6 +108,9 @@ class CameraProcessor:
                     color = (255, 0, 0) if result_was_local else (0, 255, 0)
                     if self.is_valid_brazilian_plate(plate_text):
                         clean_plate_text = self.clear_plate(plate_text)
+                        is_registered = self.history_manager.is_plate_registered(clean_plate_text)
+                        self.history_manager.add_entry(clean_plate_text, self.camera_id, is_registered)
+                        status = "Cadastrada" if is_registered else "Não cadastrada"
                         cv2.putText(frame, f"{self.camera_id} - Placa: {clean_plate_text}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
                         self.history_manager.add_entry(clean_plate_text, self.camera_id)
                     cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)

@@ -22,19 +22,43 @@
         </div>
     </form>
 
+    <div class="card p-3 mb-4"> 
+        <h5>Cadastrar Placa</h5>
+        <form action="/register plate" method="post" class="row g-2">
+            <div class="col-md-8">
+                <input type="text" class="form-contro" name="plate" placeholder="Digite a placa (ex: ABC1234)" required>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-success w-100"> Cadastrar Placa </button>
+            </div>
+        </form>
+        <div class="ut-2">,
+            <strong>Placas cadastradas:</strong>
+            <ul class="list-inline">
+                {% for plate in registered_plates %} 
+                <li class="list-inline-item">
+                    <span class="badge bg-primary">{{ plate }}</span>
+                    <a href="/remove plate/{{ plate }}" class= "btn btn-sm btn-outline-danger ms-1"> Remover </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
     <hr>
 
     <h2 class="mb-4">Câmeras Ativas</h2>
-    <div class="row">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for cam_id in cameras %}
-        <div class="col-md-6 mb-4">
-            <div class="card shadow-sm">
+        <div class="col d-flex align-items-strectch">
+            <div class="card shadow-sm w-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">{{ cam_id }}</h5>
                     <a href="/remove_camera/{{ cam_id }}" class="btn btn-sm btn-outline-danger">Remover</a>
                 </div>
                 <div class="card-body p-0">
                     <img src="/video/{{ cam_id }}" class="img-fluid" alt="Stream da câmera">
+                    <div id="status-{{ cam_id }}" class="p-2"></div>
                 </div>
             </div>
         </div>
@@ -88,9 +112,34 @@ function atualizarHistorico() {
         });
 }
 
+
 // Atualiza imediatamente e depois a cada segundo
 atualizarHistorico();
 setInterval(atualizarHistorico, 1000);
+
+function atualizarStatusPlacas(){
+    fetch('api/ultimas_placas')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(entry => {
+                const plate = entry[0];
+                const cam_id = entry [1];
+                fetch(`/api/placa_status/${plate}`)
+                    .then(resp => resp.json())
+                    .then(statusData => {
+                        const statusDiv = document.getElementById(`status-${cam_id}`);
+                        if(statusDiv){
+                            statusDiv.innerHTML = `<span class="badge ${statusData.registered ? 'bg-success' : 'bg-danger'}">
+                                ${plate} - ${statusData.registered ? 'Cdastrada' : 'Não cadastrada'} 
+                            </span>`;
+                        }
+                    })
+            })
+        })
+}
+
+setInterval(atualizarStatusPlacas, 2000);
+atualizarStatusPlacas();
 </script>
 
 </body>

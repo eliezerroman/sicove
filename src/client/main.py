@@ -1,9 +1,12 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 import os
 import json
 import cv2
 import threading
 import time
-from flask import Flask, request, Response, render_template, redirect, url_for, jsonify
+from flask import Flask, request, Response, render_template, redirect, url_for, jsonify, flash
 from src.client.local_inference import LocalPlateDetector
 from src.client.remote_inference import RemotePlateDetector
 from src.monitoring.network_monitor import NetworkMonitor
@@ -45,7 +48,8 @@ threading.Thread(target=network_monitor.start, daemon=True).start()
 @app.route("/", methods=["GET"])
 def index():
     history = plate_history.list_all()
-    return render_template("index.html", cameras=cameras, plate_history=history)
+    registered = plate_history.list_registered()
+    return render_template("index.html", cameras=cameras, plate_history=history, registered_plates=registered)
 
 
 @app.route("/add_camera", methods=["POST"])
@@ -89,6 +93,27 @@ def video(cam_id):
 def ultimas_placas():
     history = plate_history.list_all(limit=10)
     return jsonify(history)
+
+@app.route("/register_plate", methods=["POST"])
+def register_plate():
+    plate = request.form["plate"].strip.upper()
+    if plate: 
+        plate_history.register_plate(plate)
+        flash(f"Placa {plate} cadastrada com sucesso!", "success")
+    return redirect(url_for("index"))
+
+@app.route("/remove_plate/<plate>")
+def remove_plate(plate):
+    plate_history.remove_plate(plate)
+    flash(f"Placa {plate} removida!", "warning")
+    return redirect(url_for("index"))
+
+@app.route("/api/placa_status/<plate>")
+def placa_satus(plate):
+    is_registered =plate_history.is_plate_registered(plate)
+    return jsonify({"registered": is_registered})
+    
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=45000, debug=True, threaded=True)

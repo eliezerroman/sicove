@@ -1,11 +1,79 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f6f8fb;
+    color: #222;
+}
+
+h2,
+h5 {
+    color:#3a4a5d;
+    font-weight: 600;
+}
+
+.card {
+    border: none;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px 0 rgba(60, 72,88,0,08);
+    background: #fff;
+    transition: box-shadow 0.2s;
+}
+
+.card:hover {
+    box-shadow: 0 8px 32px 0 rgba(60,72,88,0.16);
+}
+
+.card-header {
+    background: linear-gradient (90deg, #e3eafc 0%, #f6f8fb 100%);
+    border-radius: 18px 18px 0 0; 
+    border-bottom: none;
 }
 
 .card img {
-    border-bottom: 1px solid #ddd;
+border-radius: 0 0 18px 18px;
 }
 
-form input {
-    min-width: 100%;
+.btn-primary {
+background: linear-gradient(90deg, #6ea8fe 0%, #4f8eff 100%);
+border: none;
+border-radius: 8px; 
+font-weight: 500;
+transition: background 0.2s;
+}
+
+.btn-primary:hover{
+    background: linear-gradient (98deg, #4f8cff 0%, #6ea8fe 100%);
+}
+.btn-outline-danger { 
+    border-radius: 8px;
+}
+
+form input, .form-control { 
+    border-radius: 8px;
+    border: 1px solid #dbeafe;
+    background: #fafdff;
+    transition: border 0.2s;
+}
+
+.form input, .form-control:focus {
+    border: 1.5px solid #6ea8fe;
+    box-shadow: 0 0 0 2px #e3eafc;
+}
+
+.list-group-item{ 
+    border: none; 
+    border-radius: 10px; 
+    margin-bottom: 8px;
+    background: #fafdff;
+    box-shadow: 0, 2px 8px 0 rgba(60,72,88,0.04);
+}
+
+
+#placa-historico p {
+    color:#6c757d;
+    margin: 0;
+}
+
+hr {
+    border-top: 1.5px solid #e3eafc;
+    margin: 2.5rem 0 2rem 0;
 }

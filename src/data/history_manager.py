@@ -22,11 +22,32 @@ class PlateHistory:
             CREATE INDEX IF NOT EXISTS idx_unique_entry 
             ON plate_history (plate, camera_id, timestamp)
         ''')
+
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS registered_plates (
+               plate TEXT PRIMARY KEY
+            )
+        ''')
         
         self.conn.commit()
 
 
     from datetime import datetime
+    def is_plate_registered(self, plate):
+        self.cursor.execute('SELECT 1 FROM registered_plates WHERE plate = ?' , (plate,))
+        return self.cursor.fetchone() is not None
+    
+    def register_plate(self,plate):
+        self.cursor.execute('INSERT OR IGNORE INTO registered_plates (plate) VALUES (?)' , (plate,))
+        self.conn.commit
+
+    def remove_plate(self,plate):
+        self.cursor.execute('DELETE FROM registered_plates WHERE plate = ?' , (plate,))
+        self.conn.commit
+
+    def list_registered(self):
+        self.cursor.execute('SELECT plate FROM registered_plates')
+        return [row[0] for row in self.cursor.fetchall()]
 
     def add_entry(self, plate, camera_id):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
