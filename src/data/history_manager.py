@@ -77,7 +77,13 @@ class PlateHistory:
 
     def list_all(self, limit=None):
         cursor = self.conn.cursor()
-        query = 'SELECT plate, camera_id, timestamp FROM plate_history ORDER BY timestamp DESC'
+        query = '''
+            SELECT ph.plate, ph.camera_id, ph.timestamp,
+                CASE WHEN rp.plate IS NOT NULL THEN 1 ELSE 0 END AS registered
+            FROM plate_history ph
+            LEFT JOIN registered_plates rp ON ph.plate = rp.plate
+            ORDER BY ph.timestamp DESC
+        '''
         if limit:
             query += f' LIMIT {limit}'
         cursor.execute(query)

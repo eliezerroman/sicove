@@ -16,6 +16,7 @@ from src.data.history_manager import PlateHistory
 CAMERA_CONFIG_PATH = "src/data/camera_config.json"
 
 app = Flask(__name__, template_folder="../interface/templates", static_folder="../interface/static")
+app.secret_key = 'chave-secreta-teste'
 cameras = {}
 
 plate_history = PlateHistory(db_path="src/data/plates.db")
@@ -96,7 +97,7 @@ def ultimas_placas():
 
 @app.route("/register_plate", methods=["POST"])
 def register_plate():
-    plate = request.form["plate"].strip.upper()
+    plate = request.form["plate"].strip().upper()
     if plate: 
         plate_history.register_plate(plate)
         flash(f"Placa {plate} cadastrada com sucesso!", "success")

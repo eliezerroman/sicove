@@ -22,23 +22,29 @@
         </div>
     </form>
 
-    <div class="card p-3 mb-4"> 
-        <h5>Cadastrar Placa</h5>
-        <form action="/register plate" method="post" class="row g-2">
-            <div class="col-md-8">
-                <input type="text" class="form-contro" name="plate" placeholder="Digite a placa (ex: ABC1234)" required>
+    <div class="card p-4 mb-4 shadow-sm">
+        <h4 class="mb-3">Cadastrar Nova Placa</h4>
+        
+        <form action="/register_plate" method="post" class="row g-3 align-items-center">
+            <div class="col-md-9">
+                <input type="text" class="form-control form-control-lg" name="plate" placeholder="Digite a placa (ex: ABC1234)" required>
             </div>
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-success w-100"> Cadastrar Placa </button>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-success btn-lg w-100">Cadastrar</button>
             </div>
         </form>
-        <div class="ut-2">,
-            <strong>Placas cadastradas:</strong>
+
+        <hr class="my-4">
+
+        <div>
+            <h5 class="mb-3">Placas Cadastradas</h5>
             <ul class="list-inline">
                 {% for plate in registered_plates %} 
-                <li class="list-inline-item">
-                    <span class="badge bg-primary">{{ plate }}</span>
-                    <a href="/remove plate/{{ plate }}" class= "btn btn-sm btn-outline-danger ms-1"> Remover </a>
+                <li class="list-inline-item text-center mb-3 me-3">
+                    <div class="d-flex flex-column align-items-center p-2 border rounded shadow-sm bg-light">
+                        <span class="badge bg-primary fs-4 mb-2">{{ plate }}</span>
+                        <a href="/remove_plate/{{ plate }}" class="btn btn-sm btn-outline-danger">Remover</a>
+                    </div>
                 </li>
                 {% endfor %}
             </ul>
@@ -48,7 +54,7 @@
     <hr>
 
     <h2 class="mb-4">Câmeras Ativas</h2>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2 g-4">
         {% for cam_id in cameras %}
         <div class="col d-flex align-items-strectch">
             <div class="card shadow-sm w-100">
@@ -58,10 +64,7 @@
                 </div>
                 <div class="card-body p-0">
                     <img src="/video/{{ cam_id }}" class="img-fluid" alt="Stream da câmera">
-                   <!-- <div id="status-{{ cam_id }}" class="p-2"></div> -->
-                    
                 </div>
-                <div id="status-{{ cam_id }}" class="p-2"></div>
             </div>
         </div>
         {% endfor %}
@@ -94,17 +97,37 @@ function atualizarHistorico() {
                 container.innerHTML = '<p>Nenhuma placa detectada.</p>';
                 return;
             }
-            let html = '<ul class="list-group">';
-            data.forEach(entry => {
-            html += `
-            <li class="list-group-item">
-                <div class="row text-center">
-                    <div class="col-md-4"><strong>${entry[1]}</strong></div> <!-- Câmera -->
-                    <div class="col-md-4 text-primary"><strong>${entry[0]}</strong></div> <!-- Placa -->
-                    <div class="col-md-4 text-muted">${entry[2]}</div> <!-- Data/Horário -->
+
+            let html = `
+                <div class="row text-center fw-bold mb-2">
+                    <div class="col-md-3">Câmera</div>
+                    <div class="col-md-3">Placa</div>
+                    <div class="col-md-3">Data/Horário</div>
+                    <div class="col-md-3">Status</div>
                 </div>
-            </li>`;
-        });
+                <ul class="list-group">
+            `;
+
+            data.forEach(entry => {
+                const camera_id = entry[1];
+                const plate = entry[0];
+                const timestamp = entry[2];
+                const isRegistered = entry[3]; // 1 = cadastrada, 0 = não
+
+                html += `
+                    <li class="list-group-item">
+                        <div class="row text-center">
+                            <div class="col-md-3"><strong>${camera_id}</strong></div>
+                            <div class="col-md-3 text-primary"><strong>${plate}</strong></div>
+                            <div class="col-md-3 text-muted">${timestamp}</div>
+                            <div class="col-md-3">
+                                <span class="badge ${isRegistered ? 'bg-success' : 'bg-danger'}">
+                                    ${isRegistered ? 'Cadastrada' : 'Não cadastrada'}
+                                </span>
+                            </div>
+                        </div>
+                    </li>`;
+            });
 
             html += '</ul>';
             container.innerHTML = html;
@@ -114,43 +137,8 @@ function atualizarHistorico() {
         });
 }
 
-
-// Atualiza imediatamente e depois a cada segundo
-//atualizarHistorico();
-//setInterval(atualizarHistorico, 1000);
-
-function atualizarStatusPlacas(){
-    fetch('api/ultimas_placas')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(entry => {
-                const plate = entry[0];
-                const cam_id = entry [1];
-                fetch(`/api/placa_status/${plate}`)
-                    .then(resp => resp.json())
-                    .then(statusData => {
-                        const statusDiv = document.getElementById(`status-${cam_id}`);
-                        if(statusDiv){
-                            statusDiv.innerHTML = `<span class="badge ${statusData.registered ? 'bg-success' : 'bg-danger'}">
-                                ${plate} - ${statusData.registered ? 'Cadastrada' : 'Não cadastrada'} 
-                            </span>`;
-                        }
-                    })
-            })
-        })
-}
-
-//setInterval(atualizarStatusPlacas, 1000);
-//atualizarStatusPlacas();
-
-function atualizarTudo() {
-    atualizarHistorico();
-    setTimeout(atualizarStatusPlacas, 300); // pequena pausa entre elas
-}
-
-setInterval(atualizarTudo, 1000); // atualiza tudo a cada 2s
-
-
+atualizarHistorico();
+setInterval(atualizarHistorico, 1000); // ou outro intervalo confortável
 </script>
 
 </body>
