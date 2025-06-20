@@ -58,8 +58,10 @@
                 </div>
                 <div class="card-body p-0">
                     <img src="/video/{{ cam_id }}" class="img-fluid" alt="Stream da câmera">
-                    <div id="status-{{ cam_id }}" class="p-2"></div>
+                   <!-- <div id="status-{{ cam_id }}" class="p-2"></div> -->
+                    
                 </div>
+                <div id="status-{{ cam_id }}" class="p-2"></div>
             </div>
         </div>
         {% endfor %}
@@ -114,8 +116,8 @@ function atualizarHistorico() {
 
 
 // Atualiza imediatamente e depois a cada segundo
-atualizarHistorico();
-setInterval(atualizarHistorico, 1000);
+//atualizarHistorico();
+//setInterval(atualizarHistorico, 1000);
 
 function atualizarStatusPlacas(){
     fetch('api/ultimas_placas')
@@ -130,7 +132,7 @@ function atualizarStatusPlacas(){
                         const statusDiv = document.getElementById(`status-${cam_id}`);
                         if(statusDiv){
                             statusDiv.innerHTML = `<span class="badge ${statusData.registered ? 'bg-success' : 'bg-danger'}">
-                                ${plate} - ${statusData.registered ? 'Cdastrada' : 'Não cadastrada'} 
+                                ${plate} - ${statusData.registered ? 'Cadastrada' : 'Não cadastrada'} 
                             </span>`;
                         }
                     })
@@ -138,8 +140,17 @@ function atualizarStatusPlacas(){
         })
 }
 
-setInterval(atualizarStatusPlacas, 2000);
-atualizarStatusPlacas();
+//setInterval(atualizarStatusPlacas, 1000);
+//atualizarStatusPlacas();
+
+function atualizarTudo() {
+    atualizarHistorico();
+    setTimeout(atualizarStatusPlacas, 300); // pequena pausa entre elas
+}
+
+setInterval(atualizarTudo, 1000); // atualiza tudo a cada 2s
+
+
 </script>
 
 </body>

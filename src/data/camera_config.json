@@ -1,1 +1,4 @@
-{}
+{
+  "cam1": "rtsp://admin:sicove2025@192.168.15.9:554/onvif2",
+  "cam2": "rtsp://admin:sicove2025@192.168.15.26:554/onvif2"
+}
