@@ -43,7 +43,7 @@ camera_config = load_camera_config()
 for cam_id, rtsp in camera_config.items():
     start_camera(cam_id, rtsp)
 
-network_monitor = NetworkMonitor(host="192.168.15.1", interval=1, status_file="src/monitoring/network_status.json")
+network_monitor = NetworkMonitor(host="192.168.15.18", interval=1, status_file="src/monitoring/network_status.json")
 threading.Thread(target=network_monitor.start, daemon=True).start()
 
 @app.route("/", methods=["GET"])

@@ -93,7 +93,8 @@ class CameraProcessor:
                 continue
 
             rtt_ms, throughput_mbps = self._load_network_status()
-            use_local = rtt_ms > 18 or throughput_mbps < 2_000
+            #use_local = rtt_ms > 18 or throughput_mbps < 2_000
+            use_local = rtt_ms > 70 or throughput_mbps < 10
 
             if use_local and not self.is_local_detecting:
                 self.is_local_detecting = True

@@ -4,7 +4,7 @@ from src.proto import plate_detection_pb2
 from src.proto import plate_detection_pb2_grpc
 
 class RemotePlateDetector:
-    def __init__(self, server_address="localhost:50051"):
+    def __init__(self, server_address="192.168.15.18:50051"):
         self.channel = grpc.insecure_channel(server_address)
         self.stub = plate_detection_pb2_grpc.PlateDetectionStub(self.channel)
 

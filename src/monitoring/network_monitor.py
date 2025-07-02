@@ -9,7 +9,7 @@ from src.monitoring.throughput_monitor import ThroughputMonitor
 class NetworkMonitor:
     def __init__(self, host, interval, status_file="src/monitoring/network_status.json"):
         self.rtt_monitor = RTTMonitor(host=host, interval=interval)
-        self.throughput_monitor = ThroughputMonitor(host="127.0.0.1")
+        self.throughput_monitor = ThroughputMonitor(host="192.168.15.18")
         self.interval = interval
         self.status_file = status_file
         self.lock = threading.Lock()
